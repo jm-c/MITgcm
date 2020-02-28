@@ -670,24 +670,29 @@ C---
       WRITE(msgBuf,'(A)') '//  '
       CALL PRINT_MESSAGE( msgBuf, ioUnit, SQUEEZE_RIGHT, myThid )
       CALL WRITE_0D_I( cg2dMaxIters,   INDEX_NONE,'cg2dMaxIters =',
-     &'   /* Upper limit on 2d con. grad iterations  */')
-      CALL WRITE_0D_I( cg2dChkResFreq, INDEX_NONE,'cg2dChkResFreq =',
-     &'   /* 2d con. grad convergence test frequency */')
+     &  '    /* Upper limit on 2d con. grad iterations  */')
+c     CALL WRITE_0D_I( cg2dChkResFreq, INDEX_NONE,'cg2dChkResFreq =',
+c    &  ' /* 2d con. grad convergence test frequency */')
       CALL WRITE_0D_I( cg2dUseMinResSol, INDEX_NONE,
      &  'cg2dUseMinResSol=',
      &  ' /* use cg2d last-iter(=0) / min-resid.(=1) solution */')
       CALL WRITE_0D_RL( cg2dTargetResidual, INDEX_NONE,
-     & 'cg2dTargetResidual =',
-     &'   /* 2d con. grad target residual  */')
+     &  'cg2dTargetResidual =', ' /* 2d con. grad target residual */')
       CALL WRITE_0D_RL( cg2dTargetResWunit, INDEX_NONE,
-     & 'cg2dTargetResWunit =',
-     &'   /* CG2d target residual [W units] */')
+     &  'cg2dTargetResWunit =',
+     &  ' /* CG2d target residual [W units] */')
       CALL WRITE_0D_I( cg2dPreCondFreq, INDEX_NONE,'cg2dPreCondFreq =',
-     &'   /* Freq. for updating cg2d preconditioner */')
+     &  ' /* Freq. for updating cg2d preconditioner */')
       CALL WRITE_0D_L( useSRCGSolver, INDEX_NONE,
-     & 'useSRCGSolver =', '  /* use single reduction CG solver(s) */')
+     &  'useSRCGSolver =','   /* use single reduction CG solver(s) */')
+      IF ( use3Dsolver ) THEN
+       CALL WRITE_0D_I( cg3dMaxIters,   INDEX_NONE,'cg3dMaxIters =',
+     &  '    /* Upper limit on 3d con. grad iterations  */')
+       CALL WRITE_0D_RL( cg3dTargetResidual, INDEX_NONE,
+     &  'cg3dTargetResidual =', ' /* 3d con. grad target residual */')
+      ENDIF
       CALL WRITE_0D_I( printResidualFreq, INDEX_NONE,
-     & 'printResidualFreq =', ' /* Freq. for printing CG residual */')
+     &  'printResidualFreq =', ' /* Freq. for printing CG residual */')
 
       WRITE(msgBuf,'(A)') '//  '
       CALL PRINT_MESSAGE( msgBuf, ioUnit, SQUEEZE_RIGHT, myThid )
