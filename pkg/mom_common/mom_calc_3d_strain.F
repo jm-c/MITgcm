@@ -80,7 +80,7 @@ C-    Fills up array edges:
 C     str11 = u_x
        DO j=1-OLy,sNy+OLy
         DO i=1-OLx,sNx+OLx-1
-          str11(i,j,k) = recip_dxF(i,j,bi,bj)
+          str11(i,j,k) = recip_dxF(i,j,bi,bj)*recip_deepFacC(k)
      &           *( uVel(i+1, j , k ,bi,bj)-uVel( i , j , k ,bi,bj) )
         ENDDO
        ENDDO
@@ -88,7 +88,7 @@ C     str11 = u_x
 C     str22 = v_y
        DO j=1-OLy,sNy+OLy-1
         DO i=1-OLx,sNx+OLx
-          str22(i,j,k) = recip_dyF(i,j,bi,bj)
+          str22(i,j,k) = recip_dyF(i,j,bi,bj)*recip_deepFacC(k)
      &           *( vVel( i ,j+1, k ,bi,bj)-vVel( i , j , k ,bi,bj) )
         ENDDO
        ENDDO
@@ -109,7 +109,7 @@ C     str12 = ( u_y + v_x )/2
      &           *( uVel( i , j , k ,bi,bj)-uVel( i ,j-1, k ,bi,bj) )
      &     +recip_dxV(i,j,bi,bj)
      &           *( vVel( i , j , k ,bi,bj)-vVel(i-1, j , k ,bi,bj) )
-     &                          )
+     &                          )*recip_deepFacC(k)
         ENDDO
        ENDDO
 
@@ -126,9 +126,9 @@ C--    should put surface wind-stress if z-coords; but right in p-coords:
         DO j=1-OLy,sNy+OLy
          DO i=2-OLx,sNx+OLx
           str13(i,j,k) = halfRL*(
-     &      recip_drC(k)*rkSign
-     &           *( uVel( i , j , k ,bi,bj)*twoRL )
-     &     +recip_dxC(i,j,bi,bj)
+     &      recip_drC(k)*deepFacF(k)*rkSign
+     &           *( uVel( i , j , k ,bi,bj)*recip_deepFacC(k)*twoRL )
+     &     +recip_dxC(i,j,bi,bj)*recip_deepFacF(k)
      &           *( wVel( i , j , k ,bi,bj)-wVel(i-1, j , k ,bi,bj) )
      &                          )
          ENDDO
@@ -136,9 +136,9 @@ C--    should put surface wind-stress if z-coords; but right in p-coords:
         DO j=2-OLy,sNy+OLy
          DO i=1-OLx,sNx+OLx
           str23(i,j,k) = halfRL*(
-     &      recip_drC(k)*rkSign
-     &           *( vVel( i , j , k ,bi,bj)*twoRL )
-     &     +recip_dyC(i,j,bi,bj)
+     &      recip_drC(k)*deepFacF(k)*rkSign
+     &           *( vVel( i , j , k ,bi,bj)*recip_deepFacC(k)*twoRL )
+     &     +recip_dyC(i,j,bi,bj)*recip_deepFacF(k)
      &           *( wVel( i , j , k ,bi,bj)-wVel( i ,j-1, k ,bi,bj) )
      &                          )
          ENDDO
@@ -148,9 +148,10 @@ C     str13 = ( u_z + w_x )/2
         DO j=1-OLy,sNy+OLy
          DO i=2-OLx,sNx+OLx
           str13(i,j,k) = halfRL*(
-     &      recip_drC(k)*rkSign
-     &           *( uVel( i , j , k ,bi,bj)-uVel( i , j ,k-1 ,bi,bj) )
-     &     +recip_dxC(i,j,bi,bj)
+     &      recip_drC(k)*deepFacF(k)*rkSign
+     &           *( uVel( i , j , k ,bi,bj)*recip_deepFacC(k)
+     &             -uVel( i , j ,k-1,bi,bj)*recip_deepFacC(k-1) )
+     &     +recip_dxC(i,j,bi,bj)*recip_deepFacF(k)
      &           *( wVel( i , j , k ,bi,bj)-wVel(i-1, j , k ,bi,bj) )
      &                          )
          ENDDO
@@ -159,9 +160,10 @@ C     str23 = ( v_z + w_y )/2
         DO j=2-OLy,sNy+OLy
          DO i=1-OLx,sNx+OLx
           str23(i,j,k) = halfRL*(
-     &      recip_drC(k)*rkSign
-     &           *( vVel( i , j , k ,bi,bj)-vVel( i , j ,k-1,bi,bj) )
-     &     +recip_dyC(i,j,bi,bj)
+     &      recip_drC(k)*deepFacF(k)*rkSign
+     &           *( vVel( i , j , k ,bi,bj)*recip_deepFacC(k)
+     &             -vVel( i , j ,k-1,bi,bj)*recip_deepFacC(k-1) )
+     &     +recip_dyC(i,j,bi,bj)*recip_deepFacF(k)
      &           *( wVel( i , j , k ,bi,bj)-wVel( i ,j-1, k ,bi,bj) )
      &                          )
          ENDDO
@@ -210,9 +212,10 @@ C     str13 = ( u_z + w_x )/2
        DO j=1-OLy,sNy+OLy
         DO i=2-OLx,sNx+OLx
           str13(i,j,k) =
-     &         recip_drF(Nr)*rkSign
-c    &      recip_drC(k)*rkSign
-     &            *( 0. _d 0 - uVel( i , j ,k-1 ,bi,bj) )
+     &         recip_drF(Nr)*deepFacF(k)*rkSign
+c    &         recip_drC(k)*deepFacF(k)*rkSign
+     &           *( zeroRL
+     &             -uVel( i , j ,k-1,bi,bj)*recip_deepFacC(k-1) )
         ENDDO
        ENDDO
 
@@ -220,9 +223,10 @@ C     str23 = ( v_z + w_y )/2
        DO j=2-OLy,sNy+OLy
         DO i=1-OLx,sNx+OLx
         str23(i,j,k) =
-     &         recip_drF(Nr)*rkSign
-c    &      recip_drC(k)*rkSign
-     &            *( 0. _d 0 - vVel( i , j ,k-1,bi,bj) )
+     &         recip_drF(Nr)*deepFacF(k)*rkSign
+c    &         recip_drC(k)*deepFacF(k)*rkSign
+     &           *( zeroRL
+     &             -vVel( i , j ,k-1,bi,bj)*recip_deepFacC(k-1) )
         ENDDO
        ENDDO
 

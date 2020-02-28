@@ -27,7 +27,7 @@ C     !INPUT PARAMETERS:
 C     rThickC_W     :: thickness (in r-units) of W-Cell at Western Edge
 C     rThickC_S     :: thickness (in r-units) of W-Cell at Southern Edge
 C     rThickC_C     :: thickness (in r-units) of W-Cell (centered on W pt)
-C     recip_rThickC :: reciprol thickness of W-Cell (centered on W-point)
+C     recip_rThickC :: reciprocal thickness of W-Cell (centered on W-point)
 C     iMin,iMax     :: 1rst index loop ranges
 C     jMin,jMax     :: 2nd  index loop ranges
       _RL str13(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr+1)
@@ -84,7 +84,7 @@ c    &         *dxG( i ,j+1,bi,bj)*rThickC_S( i ,j+1)
      &      -viscAh3d_23( i , j , k )*str23( i , j ,k)
 c    &         *dxG( i , j ,bi,bj)*rThickC_S( i , j )
      &         *dxG( i , j ,bi,bj)
-     &     )                                 )
+     &     )                                 )*recip_deepFacF(k)
      &                + recip_rThickC(i,j)
      &    *( viscAh3d_00( i , j , k )*str33( i , j , k )
      &      -viscAh3d_00( i , j ,km1)*str33( i , j ,km1)*maskM1

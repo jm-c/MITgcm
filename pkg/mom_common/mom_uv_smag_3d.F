@@ -79,7 +79,7 @@ C      (but not conserving angular momentum)
      &         *dxV( i ,j+1,bi,bj)
      &      -viscAh3d_12( i , j , k )*str12( i , j , k )
      &         *dxV( i , j ,bi,bj)
-     &     )                                 )
+     &     )                                 )*recip_deepFacC(k)
      &                + recip_drF( k )
      &    *( viscAh3d_13( i , j ,k+1)*str13( i , j ,k+1)
 c    &         *maskW(i,j,kp1,bi,bj)*maskP1
@@ -101,7 +101,7 @@ c    &         *maskW(i,j,km1,bi,bj)*maskM1
      &         *dxF( i , j ,bi,bj)
      &      -viscAh3d_00( i ,j-1, k )*str22( i ,j-1,k)
      &         *dxF( i ,j-1,bi,bj)
-     &     )                                )
+     &     )                                )*recip_deepFacC(k)
      &                + recip_drF( k )
      &    *( viscAh3d_23( i , j ,k+1)*str23( i , j ,k+1)
 c    &         *maskS(i,j,kp1,bi,bj)*maskP1

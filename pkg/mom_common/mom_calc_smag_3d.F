@@ -117,7 +117,8 @@ C--  ------------------------------------------------------------------
 C     Current level k --> n=1
       kl = k
       n = 1
-      tmpFac = smag3D_coeff*twoRL*SQRT(twoRL)*drF(kl)**twoThird
+      tmpFac = smag3D_coeff*twoRL*SQRT(twoRL)
+     &       *( drF(kl)*deepFac2C(kl) )**twoThird
 
 C     viscAh3d_00 = sqrt( S11+S22+S33+2*(S12+S13+S23) ) @ grid-cell center
 
@@ -169,7 +170,8 @@ C--  ------------------------------------------------------------------
 C     Next level k+1 --> n=2
       kl = k+1
       n = 2
-      tmpFac = smag3D_coeff*twoRL*SQRT(twoRL)*drC(kl)**twoThird
+      tmpFac = smag3D_coeff*twoRL*SQRT(twoRL)
+     &       *( drC(kl)*deepFac2F(kl) )**twoThird
 
 C     viscAh3d_13 = sqrt( S11+S22+S33+2*(S12+S13+S23) ) @ above uVel
 
