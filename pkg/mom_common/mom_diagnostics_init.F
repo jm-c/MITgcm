@@ -239,6 +239,40 @@ C--   add diagnostics for viscosity coefficients:
       CALL DIAGNOSTICS_ADDTOLIST( diagNum,
      I          diagName, diagCode, diagUnits, diagTitle, 0, myThid )
 
+#ifdef ALLOW_SMAG_3D
+      diagName  = 'Smag3d00'
+      diagTitle = '3-D Smagorinsky Harm Viscosity @ grid-cell center'
+      diagUnits = 'm^2/s           '
+      diagCode  = 'SM      MR      '
+      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
+     I          diagName, diagCode, diagUnits, diagTitle, 0, myThid )
+
+      diagName  = 'Smag3d12'
+      diagTitle = '3-D Smagorinsky Harm Viscosity @ grid-cell corner'
+      diagUnits = 'm^2/s           '
+      diagCode  = 'SZ      MR      '
+      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
+     I          diagName, diagCode, diagUnits, diagTitle, 0, myThid )
+
+      diagName  = 'Smag3d13'
+      diagTitle = '3-D Smagorinsky Harm Viscosity @ above uVel'
+      diagUnits = 'm^2/s           '
+      diagCode  = 'SU      LX      '
+      diagMate  = diagNum + 2
+      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
+     I   diagName, diagCode, diagUnits, diagTitle, diagMate, myThid )
+      CALL DIAGNOSTICS_SETKLEV( diagName, Nr+1, myThid )
+
+      diagName  = 'Smag3d23'
+      diagTitle = '3-D Smagorinsky Harm Viscosity @ above vVel'
+      diagUnits = 'm^2/s           '
+      diagCode  = 'SV      LX      '
+      diagMate  = diagNum
+      CALL DIAGNOSTICS_ADDTOLIST( diagNum,
+     I   diagName, diagCode, diagUnits, diagTitle, diagMate, myThid )
+      CALL DIAGNOSTICS_SETKLEV( diagName, Nr+1, myThid )
+#endif /* ALLOW_SMAG_3D */
+
 C--   add diagnostics of simple derivative quantities:
       diagName  = 'momKE   '
       diagTitle = 'Kinetic Energy (in momentum Eq.)'

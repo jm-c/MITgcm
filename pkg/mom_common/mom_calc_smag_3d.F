@@ -208,10 +208,16 @@ C     viscAh3d_23 = sqrt( S11+S22+S33+2*(S12+S13+S23) ) @ above vVel
       ENDDO
 
 #ifdef ALLOW_DIAGNOSTICS
-c     IF ( useDiagnostics.AND. k.EQ.Nr ) THEN
-c       CALL DIAGNOSTICS_FILL( viscAh3d_00, 'Smag3D_C',
-c    &                         0, Nr, 2, bi, bj, myThid )
-c     ENDIF
+      IF ( useDiagnostics .AND. k.EQ.Nr ) THEN
+        CALL DIAGNOSTICS_FILL( viscAh3d_00, 'Smag3d00',
+     &                         0, Nr, 2, bi, bj, myThid )
+        CALL DIAGNOSTICS_FILL( viscAh3d_12, 'Smag3d12',
+     &                         0, Nr, 2, bi, bj, myThid )
+        CALL DIAGNOSTICS_FILL( viscAh3d_13, 'Smag3d13',
+     &                         0, Nr+1, 2, bi, bj, myThid )
+        CALL DIAGNOSTICS_FILL( viscAh3d_23, 'Smag3d23',
+     &                         0, Nr+1, 2, bi, bj, myThid )
+      ENDIF
 #endif
 
 #endif /* ALLOW_SMAG_3D */
