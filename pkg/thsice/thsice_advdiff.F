@@ -240,7 +240,7 @@ CADJ STORE icevol(:,:) = comlev1_bibj, key=ticekey, byte=isbyte
 CADJ STORE utrice(:,:) = comlev1_bibj, key=ticekey, byte=isbyte
 CADJ STORE vtrice(:,:) = comlev1_bibj, key=ticekey, byte=isbyte
 #endif
-        CALL THSICE_ADVECTION(
+        CALL GAD_ICE_ADVECTION(
      I       GAD_SI_FRAC,  thSIceAdvScheme, .TRUE.,
      I       uTrIce, vTrIce, maskOce, thSIce_deltaT, areaEpsil,
      U       iceVol, iceFrc,
@@ -253,7 +253,7 @@ C--   Snow thickness
           iceVol(i,j) = iceMask(i,j,bi,bj)*rA(i,j,bi,bj)
          ENDDO
         ENDDO
-        CALL THSICE_ADVECTION(
+        CALL GAD_ICE_ADVECTION(
      I       GAD_SI_HSNOW, thSIceAdvScheme, .FALSE.,
      I       uTrans, vTrans, maskOce, thSIce_deltaT, areaEpsil,
      U       iceVol, snowHeight(1-OLx,1-OLy,bi,bj),
@@ -271,7 +271,7 @@ C--   sea-ice Thickness
           oldVol(i,j) = iceVol(i,j)*iceHeight(i,j,bi,bj)
          ENDDO
         ENDDO
-        CALL THSICE_ADVECTION(
+        CALL GAD_ICE_ADVECTION(
      I       GAD_SI_HICE,  thSIceAdvScheme, .FALSE.,
      I       uTrans, vTrans, maskOce, thSIce_deltaT, areaEpsil,
      U       iceVol, iceHeight(1-OLx,1-OLy,bi,bj),
@@ -351,7 +351,7 @@ C--   Enthalpy in layer 1
           iceVol(i,j) = oldVol(i,j)
          ENDDO
         ENDDO
-        CALL THSICE_ADVECTION(
+        CALL GAD_ICE_ADVECTION(
      I       GAD_SI_QICE1, thSIceAdvScheme, .FALSE.,
      I       uTrIce, vTrIce, maskOce, thSIce_deltaT, vol_Epsil,
      U       iceVol, Qice1(1-OLx,1-OLy,bi,bj),
@@ -388,7 +388,7 @@ C--   Enthalpy in layer 2
           iceVol(i,j) = oldVol(i,j)
          ENDDO
         ENDDO
-        CALL THSICE_ADVECTION(
+        CALL GAD_ICE_ADVECTION(
      I       GAD_SI_QICE2, thSIceAdvScheme, .FALSE.,
      I       uTrIce, vTrIce, maskOce, thSIce_deltaT, vol_Epsil,
      U       iceVol, Qice2(1-OLx,1-OLy,bi,bj),

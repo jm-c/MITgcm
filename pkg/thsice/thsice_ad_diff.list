@@ -1,5 +1,4 @@
 thsice_advdiff.f
-thsice_advection.f
 thsice_albedo.f
 thsice_ave.f
 thsice_balance_frw.f

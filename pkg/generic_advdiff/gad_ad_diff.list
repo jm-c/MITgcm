@@ -31,6 +31,7 @@ gad_fluxlimit_adv_x.f
 gad_fluxlimit_adv_y.f
 gad_grad_x.f
 gad_grad_y.f
+gad_ice_advection.f
 gad_implicit_r.f
 gad_init_varia.f
 gad_os7mp_adv_x.f

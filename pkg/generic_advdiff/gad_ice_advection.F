@@ -1,6 +1,6 @@
-#include "THSICE_OPTIONS.h"
-#ifdef ALLOW_GENERIC_ADVDIFF
-# include "GAD_OPTIONS.h"
+#include "GAD_OPTIONS.h"
+#ifdef ALLOW_THSICE
+# include "THSICE_OPTIONS.h"
 #endif
 #ifdef ALLOW_AUTODIFF
 # include "AUTODIFF_OPTIONS.h"
@@ -8,10 +8,10 @@
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 CBOP
-C !ROUTINE: THSICE_ADVECTION
+C !ROUTINE: GAD_ICE_ADVECTION
 
 C !INTERFACE: ==========================================================
-      SUBROUTINE THSICE_ADVECTION(
+      SUBROUTINE GAD_ICE_ADVECTION(
      I     tracerIdentity,
      I     advectionScheme,
      I     useGridArea,
@@ -21,17 +21,18 @@ C !INTERFACE: ==========================================================
      I     bi, bj, myTime, myIter, myThid)
 
 C !DESCRIPTION:
-C Calculates the tendency of a sea-ice field due to advection.
+C This routine is an adaption of the GAD_MULTIDIM_COMPRESSIBLE version
+C  of S/R GAD_ADVECTION for intensive, 2D-fields. The input transport is
+C  meant to be the full transport of the quantity which the current
+C  intensive field describes (e.g., advecting ice enthalpy per mass unit
+C  with corresponding ice-mass transport).
+C
+C It updates a sea-ice field due to advection tendency.
 C It uses the multi-dimensional method given in \ref{sect:multiDimAdvection}
 C and can only be used for the non-linear advection schemes such as the
 C direct-space-time method and flux-limiters.
 C
-C This routine is an adaption of the GAD_ADVECTION for 2D-fields.
-C for Area, effective thickness or other sea-ice field,
-C  the contribution iceFld*div(u) (that is present in gad_advection)
-C  is not included here.
-C
-C The algorithm is as follows:
+C The algorithm is as follows: <-- This is not correct and needs to be updated
 C \begin{itemize}
 C \item{$\theta^{(n+1/2)} = \theta^{(n)}
 C      - \Delta t \partial_x (u\theta^{(n)}) + \theta^{(n)} \partial_x u$}
@@ -40,7 +41,6 @@ C      - \Delta t \partial_y (v\theta^{(n+1/2)}) + \theta^{(n)} \partial_y v$}
 C \item{$G_\theta = ( \theta^{(n+2/2)} - \theta^{(n)} )/\Delta t$}
 C \end{itemize}
 C
-C The tendency (output) is over-written by this routine.
 
 C !USES: ===============================================================
       IMPLICIT NONE
@@ -48,20 +48,23 @@ C !USES: ===============================================================
 #include "EEPARAMS.h"
 #include "PARAMS.h"
 #include "GRID.h"
-#if ( defined ALLOW_DBUG_THSICE || defined ALLOW_AUTODIFF_TAMC )
-# include "THSICE_SIZE.h"
-#endif
-#ifdef ALLOW_GENERIC_ADVDIFF
-# include "GAD.h"
-#endif
+#include "GAD.h"
 #ifdef ALLOW_EXCH2
 #include "W2_EXCH2_SIZE.h"
 #include "W2_EXCH2_TOPOLOGY.h"
 #endif /* ALLOW_EXCH2 */
+#ifdef ALLOW_THSICE
+# if ( defined ALLOW_DBUG_THSICE || defined ALLOW_AUTODIFF_TAMC )
+#  include "THSICE_SIZE.h"
+# endif
+#endif /* ALLOW_THSICE */
 #ifdef ALLOW_AUTODIFF_TAMC
 # include "tamc.h"
 # include "tamc_keys.h"
-#endif
+# ifndef ALLOW_THSICE
+      INTEGER ticekey, ikey_4
+# endif
+#endif /* ALLOW_AUTODIFF_TAMC */
 
 C !INPUT PARAMETERS: ===================================================
 C  tracerIdentity  :: tracer identifier (required only for OBCS)
@@ -99,7 +102,7 @@ C  afy             :: horizontal advective flux, y direction
       _RL afx   (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
       _RL afy   (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
 
-#ifdef ALLOW_GENERIC_ADVDIFF
+#if ( defined ALLOW_SEAICE || defined ALLOW_THSICE )
 C !LOCAL VARIABLES: ====================================================
 C  maskLocC      :: 2-D array mask at grid-cell center
 C  maskLocW      :: 2-D array for mask at West points
@@ -374,7 +377,7 @@ C-     Compute CFL number
      O             af, myThid )
          ELSE
           STOP
-     & 'THSICE_ADVECTION: adv. scheme incompatibale with multi-dim'
+     &    'GAD_ICE_ADVECTION: adv. scheme incompatibale with mutli-dim'
          ENDIF
 
 C--   Internal exchange for next calculations in Y
@@ -590,7 +593,7 @@ C-     Compute CFL number
      O             af, myThid )
          ELSE
           STOP
-     &  'THSICE_ADVECTION: adv. scheme incompatibale with mutli-dim'
+     &    'GAD_ICE_ADVECTION: adv. scheme incompatibale with mutli-dim'
          ENDIF
 
          IF ( overlapOnly .AND. ipass.EQ.1 ) THEN
@@ -753,13 +756,13 @@ C-    explicit advection is done ; add some debugging print
      &     .AND. k.LE.3 .AND. myIter.EQ.1+nIter0
      &     .AND. nPx.EQ.1 .AND. nPy.EQ.1
      &     .AND. useCubedSphereExchange ) THEN
-       CALL DEBUG_CS_CORNER_UV( ' afx,afy from THSICE_ADVECTION',
+       CALL DEBUG_CS_CORNER_UV( ' afx,afy from GAD_ICE_ADVECTION',
      &      afx,afy, k, standardMessageUnit,bi,bj,myThid )
       ENDIF
 #endif /* ALLOW_DEBUG */
 #endif /* ALLOW_DBUG_THSICE */
 
-#endif /* ALLOW_GENERIC_ADVDIFF */
+#endif /* ALLOW_SEAICE or ALLOW_THSICE */
 
       RETURN
       END
