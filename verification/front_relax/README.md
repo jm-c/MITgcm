@@ -9,7 +9,7 @@ This experiment contains 5 set-up (with corresponding *input[.\*]/* dir) that ca
 the same executable (built from *build/* dir using customized code from *code/*);
 binary input files have been generated using matlab script *gendata.m*
 from the corresponding *input* dir.
-All five uses a simple EOS (*rho' = -rhoNil alpha T'*) and treats salt as a passive tracer ;
+All five uses a simple EOS ( $\rho' = -\rho_0 \alpha \theta'$ ) and treats salt as a passive tracer ;
 without any surface forcing, the density front is expected to flatten (GM effect)
 while salinity spread along isopycnal (Redi diffusion).
 
@@ -46,7 +46,7 @@ The last secondary test ***input.top/*** shares some similarity with the previou
 *50 m* near the center, as it would under, e.g., a floating ice-shelf.
 Also the mixed layer is thinner (*60 m* only) and very weakly stratified ( $N = 10^{-6} ~s^{-1}$ )
 and vertical resolution is slightly different, reaching a maximum depth of *2.5 km*
-(vs only *2 km* in 2 previous set-up).
+(vs only *2 km* in previous 2 set-up).
 
 ### Instructions:
 Configure and compile the code:
@@ -74,7 +74,7 @@ To run any of secondary "sc" test ("$sc" in: "in_p", "mxl", "bvp", "top"):
   rm *
   ln -s ../input.$sc/* .
   ln -s ../input/* .
-  ( ./prepare_run )       #- only for "bvp" test
+  ./prepare_run          #- only for "bvp" test
   ../build/mitgcmuv > output.txt
 ```
 note that the "prepare_run" step is only needed for "bvp" test
@@ -83,4 +83,6 @@ There is comparison output in the directory:
   results/output.$sc.txt
 
 ### Notes:
-  more to come
+1. **comparison between P and Z coordiantes**:
+2. **testing Redi tensor alone**:
+3. **checking the implementation of X-direction fluxes**:
