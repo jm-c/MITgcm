@@ -31,7 +31,7 @@ It uses the advective form of GM with same Redi and GM diffusivity
 (see: *input.in_p/data.gmredi*).
 
 The next two secondary setup, ***input.mxl/*** and ***input.bvp/*** are very similar,
-using the same binary input files from *input.mxl/* dir that use the full
+sharing the same binary input files from *input.mxl/* dir ; they use the full
 25 level model to represent a 10 level, *200 m* thick mixed layer on top of a stratified warm bowl of water.
 The ***input.mxl/*** illustrates the use of the transition-layer tapering scheme 'fm07'
 with the skew-flux formulation of GM with same Redi and GM diffusivity
@@ -39,7 +39,7 @@ with the skew-flux formulation of GM with same Redi and GM diffusivity
 while the secondary test ***input.bvp/*** has a sloping bottom and uses the
 Boundary-Value Problem (GM_useBVP=T, with 5 modes: GM_BVP_modeNumber=5,)
 of the GM advective form with same Redi and GM diffusivity (see: *input.bvp/data.gmredi*).
-In addition, the sub-meso parameterization is activated (GM_useSubMeso=T).
+In addition, in this later test, the sub-meso parameterization is activated (GM_useSubMeso=T).
 
 The last secondary test ***input.top/*** shares some similarity with the previous one
 (similar warm bowl, use BVP with GM advective form) except that the top model is depressed by
@@ -48,6 +48,7 @@ Also the mixed layer is thinner (*60 m* only) and very weakly stratified ( $N = 
 and vertical resolution is slightly different, reaching a maximum depth of *2.5 km*
 (vs only *2 km* in 2 previous set-up).
 
+### Instructions:
 Configure and compile the code:
 ```
   cd build
@@ -81,6 +82,5 @@ note that the "prepare_run" step is only needed for "bvp" test
 There is comparison output in the directory:
   results/output.$sc.txt
 
-Comments:
+### Notes:
   more to come
-
