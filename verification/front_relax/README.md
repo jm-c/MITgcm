@@ -100,11 +100,11 @@ There is comparison output in the directory:
     to be flipped ; the SSH (in *m*) comparison is between output variable 'Eta' (in-Z)
     and 'PHL' (in-P) divided by 10 (=gravity); and the bottom pressure (in *Pa*) is
     between 'PHL' (in-Z) multiplied by $1000 = \rho_0$ and 'Eta' (in-P).<br>
-    Most of the differences (e.g., after 20 time-step, T,S max-diff are
-    $1.4~10^{-4}, 2.3~10^{-5}$ and RMS $6.6~10^{-5}, 9.6~10^{-6}$ ) come from the dynamics
-    and not from GM since without dynamics (un-commenting line 34: momStepping=.FALSE.,
-    in both set-up *data* file) the differences are down to machine precision (RMS of
-    T,S diff: $1.5~10^{-14}, 1.~10^{15}$ ).
+    Most of the differences (e.g., after 20 time-steps, T,S max-diff are:
+    $1.4 ~ 10^{-4}, ~ 2.3 ~ 10^{-5}$ and RMS: $6.6~10^{-5}, 9.6~10^{-6}$ )
+    come from the dynamics and not from GM since without dynamics (un-commenting
+    line 34: momStepping=.FALSE., in both set-up *data* file) the differences are
+    down to machine precision (RMS of T,S diff: $1.5 ~ 10^{-14}, ~ 1. ~ 10^{-15}$ ).
 2. **testing GM or Redi diffusion alone** in either of the 2 set-up above:<br>
     To test GM alone, without isopycnal diffusion, just un-comment: GM_isopycK = 0.,
     in *data.gmredi*.<br>
@@ -121,11 +121,13 @@ There is comparison output in the directory:
     in parameter file *data*, which also need to be switched, e.g., for the primay set-up:
 
     > delXfile='dy.bin',
+    >
     > delY=1*10.E3,
 
     instead of:
 
     > delX=1*10.E3,
+    >
     > delYfile='dy.bin',
 
     This might be used to verify implementation of X-fluxes versus Y-fluxes.
