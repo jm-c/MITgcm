@@ -89,7 +89,7 @@ There is comparison output in the directory:
   results/output.$sc.txt
 
 ### Notes:
-1. **comparison between P and Z coordinates**:<br>
+1. **Comparison between P and Z coordinates**:<br>
     The results from the secondary set-up *input.in_p/*, using Pressure coordinate,
     can be compared to the Z-coordinate, primary set-up *input/*,
     providing one uses the same *pkg/gmredi* parameters (same 'data.gmredi'), e.g.:
@@ -101,21 +101,21 @@ There is comparison output in the directory:
     and 'PHL' (in-P) divided by 10 (=gravity); and the bottom pressure (in *Pa*) is
     between 'PHL' (in-Z) multiplied by $1000 = \rho_0$ and 'Eta' (in-P).<br>
     Most of the differences (e.g., after 20 time-steps, T,S max-diff are:
-    $1.4 ~ 10^{-4}, ~ 2.3 ~ 10^{-5}$ and RMS: $6.6~10^{-5}, 9.6~10^{-6}$ )
+    $1.4 ~ 10^{-4}, ~ 2.3 ~ 10^{-5}$ and RMS: $6.6 ~ 10^{-5}, 9.6 ~ 10^{-6}$ )
     come from the dynamics and not from GM since without dynamics (un-commenting
     line 34: momStepping=.FALSE., in both set-up *data* file) the differences are
     down to machine precision (RMS of T,S diff: $1.5 ~ 10^{-14}, ~ 1. ~ 10^{-15}$ ).
-2. **testing GM or Redi diffusion alone** in either of the 2 set-up above:<br>
+2. **Testing GM or Redi diffusion alone** in either of the 2 set-up above:<br>
     To test GM alone, without isopycnal diffusion, just un-comment: GM_isopycK = 0.,
     in *data.gmredi*.<br>
     And to test Redi diffusion alone, without GM, just set: GM_isopycK = 1000.,
     and comment out 'GM_background_K' setting in *data.gmredi*.
     Also changing the initial salinity to a centered patch (using file *Sini_Patch.bin*
     instead of *Sini_Ydir.bin*) better illustrates the Redi effects on a passive tracer.
-3. **switching from a Y-Z to X-Z set-up**<br>
+3. **Switching from a Y-Z to X-Z set-up**<br>
     Since none of the 5 set-up use any feature specific to Y-direction, all using
     'f-plane' (f0 = 1.E-4, beta=0), the same set of input files could be used by X-Z model
-    instead of the current Y-Z (simply switching sNx,nSx,nPx <-> sNy,nSy,nPy in *SIZE.h*).
+    instead of the current Y-Z (simply switching sNx,nSx,nPx <-> sNy,nSy,nPy in *SIZE.h*)
     to produce similar results (flipping U & V with 1 minus sign).
     The only minor adjustment to input files is related to the setting of delX,delY
     in parameter file *data*, which also need to be switched, e.g., for the primay set-up:
