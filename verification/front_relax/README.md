@@ -90,5 +90,37 @@ There is comparison output in the directory:
 
 ### Notes:
 1. **comparison between P and Z coordinates**:
-2. **testing Redi tensor alone**:
-3. **checking implementation of X-direction fluxes**:
+    The results from the secondary set-up *input.in_p/*, using Pressure coordinate, 
+    can be compared to the Z-coordinate, primary set-up *input/*,
+    providing one uses the same *pkg/gmredi* parameters (same 'data.gmredi'), e.g.:
+    Using GM advective form, with 'data.gmredi' from *input.in_p/* in both runs.
+    Using the GM skew-flux form, with 'data.gmredi' from *input/* for both runs.
+    Note that, for 3-D variables, the vertical index 'k' needs to be flipped ;
+    the SSH (in *m*) comparison is between output variable 'Eta' (in-Z) and 'PHL' (in-P)
+    divided by 10 (=gravity); and the bottom pressure (in *Pa*) is between 'PHL' (in-Z)
+    multiplied by $1000 = \rho_0$ and 'Eta' (in-P).
+    Most of the differences (e.g., after 20 time-step, T,S max-diff are
+    1.4e-4, 2.3e-5 and RMS 6.6e-5, 9.6e-6) come from the dynamics and not from GM 
+    since without dynamics (un-commenting line 34: momStepping=.FALSE., 
+    in both set-up *data* file) the differences are down to machine precision (RMS of
+    T,S diff: 1.5e-14, 1e-15).
+2. **testing GM or Redi diffusion alone** in either of the 2 set-up above:
+    To test GM alone, without isopycnal diffusion, just un-comment: GM_isopycK = 0.,
+    in *data.gmredi*.<br>
+    And to test Redi diffusion alone, without GM, just set: GM_isopycK = 1000.,
+    and comment out 'GM_background_K' setting in *data.gmredi*.
+    Also changing the initial salinity to a centered patch (using file *Sini_Patch.bin*
+    instead of *Sini_Ydir.bin*) better illustrates the Redi effects on a passive tracer.
+3. **switching from a Y-Z to X-Z set-up**
+    Since none of the 5 set-up use any feature specific to Y-direction, all using  
+    'f-plane' (f0 = 1.E-4, beta=0), the same set of input files could be used by X-Z model
+    instead of the current Y-Z (simply switching sNx,nSx,nPx <-> sNy,nSy,nPy in *SIZE.h*).
+    to produce similar results (flipping U & V with 1 minus sign).
+    The only minor adjustment to input files is related to the setting of delX,delY
+    in parameter file *data*, which also need to be switched, e.g., for the primay set-up:
+        delXfile='dy.bin',
+        delY=1*10.E3,
+    instead of:
+        delX=1*10.E3,
+        delYfile='dy.bin',
+    This might be used to verify implementation of X-fluxes versus Y-fluxes.
