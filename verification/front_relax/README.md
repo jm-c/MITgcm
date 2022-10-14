@@ -11,13 +11,13 @@ This experiment contains 5 set-up (with corresponding *input[.\*]/* dir) that
 can be run with the same executable (built from *build/* dir using customized
 code from *code/*); binary input files have been generated using matlab script
 *gendata.m* from the corresponding *input* dir.
-All five uses a simple EOS ( $\rho' = -\rho_0 ~ \alpha_T ~ \theta'$ ) and treats
+All five use a simple EOS ( $\rho' = -\rho_0 ~ \alpha_T ~ \theta'$ ) and treat
 salt as a passive tracer ; without any surface forcing, the density front is
 expected to flatten (GM effect) while salinity spread along isopycnal (Redi diffusion).
 
 The **primary** test, using input files from ***input/*** dir, is the simplest
 one, with flat bottom, non-uniform resolution in both direction (15 levels from
-*50 m* to *400 m* thickness near the bottom and, in Y-direction, 32 grid-points
+*50 m* to *400 m* thick near the bottom and, in Y-direction, 32 grid-points
 with about *10 km* spacing) and stratified every-where
 (background $N = 2.10^{-3} ~s^{-1}$, see matlab script *input/gendata.m*),
 avoiding the need for tapering or clipping.<br>
@@ -28,7 +28,7 @@ executable (compiled with *Nr = 25*) for all 5 set-up.
 
 The **secondary** test ***input.in_p/*** dir is the same as the primary test but
 converted to use P-coordinates instead of height coordinates. For the purpose of
-comparing P and Z coordinate, gravity and reference density 'rhoNil' are set to
+comparing P and Z coordinates, gravity and reference density 'rhoNil' are set to
 round number (respectively *10* and *1000*) to facilitate conversions.
 It uses the advective form of GM with same Redi and GM diffusivity
 (see: *input.in_p/data.gmredi*).
@@ -118,7 +118,7 @@ There is comparison output in the directory:
     instead of the current Y-Z (simply switching sNx,nSx,nPx <-> sNy,nSy,nPy in *SIZE.h*)
     to produce similar results (flipping U & V with 1 minus sign).
     The only minor adjustment to input files is related to the setting of delX,delY
-    in parameter file *data*, which also need to be switched, e.g., for the primay set-up:
+    in parameter file *data*, which also need to be switched, e.g., for the primary set-up:
 
     > delXfile='dy.bin',
     >
