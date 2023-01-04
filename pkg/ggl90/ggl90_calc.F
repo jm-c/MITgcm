@@ -1328,18 +1328,18 @@ C     ===============================
 C-     Viscosity (in m^2/s) at the right location:
        DO j=1,sNy
         DO i=1,sNx+1
-         tmpVisc = _maskW(i,j,k-1,bi,bj) * _maskW(i,j,k,bi,bj) * halfRL
-     &          *( GGL90visctmp(i-1,j,k)
-     &           + GGL90visctmp(i,  j,k) )
-         tmpVisc = MIN( tmpVisc , GGL90viscMax )
+         tmpVisc = ( GGL90visctmp(i-1,j,k) + GGL90visctmp(i,j,k) )
+     &           * halfRL
+     &           * _maskW(i,j,k-1,bi,bj) * _maskW(i,j,k,bi,bj)
+         GGL90viscArU(i,j,k,bi,bj) = MIN( tmpVisc , GGL90viscMax )
         ENDDO
        ENDDO
        DO j=1,sNy+1
         DO i=1,sNx
-         tmpVisc = _maskS(i,j,k-1,bi,bj) * _maskS(i,j,k,bi,bj) * halfRL
-     &          *( GGL90visctmp(i,j-1,k)
-     &           + GGL90visctmp(i,j,  k) )
-         tmpVisc = MIN( tmpVisc , GGL90viscMax )
+         tmpVisc =( GGL90visctmp(i,j-1,k) + GGL90visctmp(i,j,k) )
+     &           * halfRL
+     &           * _maskS(i,j,k-1,bi,bj) * _maskS(i,j,k,bi,bj)
+         GGL90viscArV(i,j,k,bi,bj) = MIN( tmpVisc , GGL90viscMax )
         ENDDO
        ENDDO
 
@@ -1386,12 +1386,14 @@ C-     Finish viscosity setting:
        DO j=1,sNy
         DO i=1,sNx+1
          tmpVisc = GGL90viscArU(i,j,k,bi,bj) * coordFac*coordFac
+c    &           * _maskW(i,j,k-1,bi,bj) * _maskW(i,j,k,bi,bj)
          GGL90viscArU(i,j,k,bi,bj) = MAX( tmpVisc, viscArNr(k) )
         ENDDO
        ENDDO
        DO j=1,sNy+1
         DO i=1,sNx
          tmpVisc = GGL90viscArV(i,j,k,bi,bj) * coordFac*coordFac
+c    &           * _maskS(i,j,k-1,bi,bj) * _maskS(i,j,k,bi,bj)
          GGL90viscArV(i,j,k,bi,bj) = MAX( tmpVisc, viscArNr(k) )
         ENDDO
        ENDDO
