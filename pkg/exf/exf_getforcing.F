@@ -228,8 +228,13 @@ CADJ STORE ustress      = comlev1, key=ikey_dynamics, kind=isbyte
 CADJ STORE vstress      = comlev1, key=ikey_dynamics, kind=isbyte
 CADJ STORE wstress      = comlev1, key=ikey_dynamics, kind=isbyte
 #  endif
+#  ifdef USE_GEOS_BULKF
+C     Compute turbulent fluxes (and surface stress) from GEOS bulk formulae
+      CALL EXF_GEOS_BULKF( myTime, myIter, myThid )
+#  else /* USE_GEOS_BULKF */
 C     Compute turbulent fluxes (and surface stress) from bulk formulae
       CALL EXF_BULKFORMULAE( myTime, myIter, myThid )
+#  endif /* USE_GEOS_BULKF */
 #  ifdef ALLOW_AUTODIFF_TAMC
 CADJ STORE evap         = comlev1, key=ikey_dynamics, kind=isbyte
 #  endif
