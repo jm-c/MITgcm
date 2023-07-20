@@ -28,6 +28,7 @@ C-- Package-specific Options & Macros go here
 
 C o I/O and pack settings
 #undef CTRL_SET_PREC_32
+C   This option is only relevant (for pack/unpack) with OBCS_CONTROL:
 #undef ALLOW_NONDIMENSIONAL_CONTROL_IO
 #undef EXCLUDE_CTRL_PACK
 #undef ALLOW_PACKUNPACK_METHOD2
@@ -105,6 +106,9 @@ C  to deprecated code that is now removed. At some point we will remove
 C  this flag and associated code as well.
 C  o apply pkg/smooth/smooth_diff2d.F to 2D controls (outside of Smooth_Correl2D)
 #undef ALLOW_SMOOTH_CTRL2D
+
+C  o Print more debug info to STDOUT
+#undef ALLOW_CTRL_DEBUG
 
 C   ==================================================================
 #endif /* ndef ECCO_CPPOPTIONS_H */
