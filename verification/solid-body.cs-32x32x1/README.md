@@ -2,10 +2,11 @@ Simple solid-body rotation test on cubed-sphere grid
 ========================================================
 
 ### Overview:
-This is a single level, steady-state example on cubed-sphere (cs-32) grid with initial zonal wind field and surface pressure anomaly that corresponds to an additional relative rotation 
-($\omega\'$) on top of the solid-planet rotation ($\Omega$) and around the same axis:
+This is a single level, steady-state example on cubed-sphere (cs-32) grid with initial zonal wind field ($U(\phi)$) and surface pressure anomaly ($\eta(\phi)$) that corresponds to an additional relative rotation ($\omega\'$) on top of the solid-planet rotation ($\Omega$) and around the same axis:
 
-$$ U = \omega' \times R \cos( \phi )$$
+$$ U(\phi) = U_{eq} ~ \cos( \phi ) ~~~ \mathrm{with:} U_{eq} = \omega' \times R $$
+
+$$ \eta(\phi) = \rho_{const} [ \Omega R + U_{eq} / 2 ] U_{eq} [ \cos^{2}(\phi - 2/3 ] $$
 
 The **secondary** test `rough.Bot` uses the logarithmic law of the wall to compute the drag coefficient for quadratic bottom drag as a function of distance from the bottom (i.e. cell thickness) and a prescribed roughness length `zRoughBot = 0.01` (in meters). For this configuration (i.e. vertical grid spacing) this value of `zRoughBot` corresponds to approximately `bottomDragQuadratic=5.E-2`. For consistency, the bottom boundary conditions is set to free slip (`no_slip_bottom=.FALSE.`).
 
