@@ -36,8 +36,8 @@ c     == global variables ==
 #include "GRID.h"
 
 #ifdef ALLOW_CTRL
-# include "ctrl.h"
-# include "optim.h"
+# include "CTRL.h"
+# include "OPTIMCYCLE.h"
 #endif
 
 c     == routine arguments ==
@@ -66,7 +66,7 @@ c     == local variables ==
       integer imin,imax
       integer nrec
       integer irec
-      integer ilfld
+      integer ilfld,ilDir
 
       _RL fctile
       _RL tmpx
@@ -77,7 +77,7 @@ c     == local variables ==
       logical doglobalread
       logical ladinit
 
-      character*(80) fnamefld
+      character*(MAX_LEN_FNAM) fnamefld
 
 c     == external functions ==
 
@@ -101,8 +101,11 @@ c--   Read state record from global file.
       doglobalread = .false.
       ladinit      = .false.
 
-c     Number of records to be used.
+c--   Number of records to be used.
       nrec = endrec-startrec+1
+
+c--   Find ctrlDir length
+      ilDir=ilnblnk( ctrlDir )
 
       do bj = jtlo,jthi
        do bi = itlo,ithi
@@ -116,8 +119,8 @@ c     Number of records to be used.
 
       if (optimcycle .ge. 0) then
         ilfld=ilnblnk( xx_gen_file )
-        write(fnamefld(1:80),'(2a,i10.10)')
-     &       xx_gen_file(1:ilfld),'.',optimcycle
+        write(fnamefld,'(2a,i10.10)')
+     &       ctrlDir(1:ilDir)//xx_gen_file(1:ilfld),'.',optimcycle
       endif
 
 c--   >>> Loop 1 to compute mean forcing:
@@ -129,7 +132,7 @@ c--   >>> Loop 1 to compute mean forcing:
       enddo
 
 c--   >>> Loop over records.
-      do irec = 1,nrec
+      do irec = startrec,endrec
 
 #ifdef ALLOW_AUTODIFF
         call active_read_xy(
@@ -204,8 +207,8 @@ c     == global variables ==
 #include "GRID.h"
 
 #ifdef ALLOW_CTRL
-# include "ctrl.h"
-# include "optim.h"
+# include "CTRL.h"
+# include "OPTIMCYCLE.h"
 #endif
 
 c     == routine arguments ==
@@ -230,7 +233,7 @@ c     == local variables ==
       integer jmin,jmax
       integer imin,imax
       integer irec
-      integer ilfld
+      integer ilfld,ilDir
 
       _RL tmpx
 
@@ -238,7 +241,7 @@ c     == local variables ==
       logical ladinit
       _RL     tmpfld3d(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
 
-      character*(80) fnamefld
+      character*(MAX_LEN_FNAM) fnamefld
 
 c     == external functions ==
 
@@ -260,6 +263,9 @@ c--   Read state record from global file.
       doglobalread = .false.
       ladinit      = .false.
 
+c--   Find ctrlDir length
+      ilDir=ilnblnk( ctrlDir )
+
       do bj = jtlo,jthi
        do bi = itlo,ithi
         do k = 1,Nr
@@ -274,8 +280,8 @@ c--   Read state record from global file.
 
       if (optimcycle .ge. 0) then
         ilfld = ilnblnk( xx_gen_file )
-        write(fnamefld(1:80),'(2a,i10.10)')
-     &       xx_gen_file(1:ilfld),'.',optimcycle
+        write(fnamefld,'(2a,i10.10)')
+     &       ctrlDir(1:ilDir)//xx_gen_file(1:ilfld),'.',optimcycle
       endif
 
 c--   >>> Loop 1 to compute mean forcing:
@@ -289,21 +295,21 @@ c--   >>> Loop 1 to compute mean forcing:
       irec = 1
 
 #ifdef ALLOW_AUTODIFF
-      call active_read_xyz( fnamefld, tmpfld3d, irec, doglobalread,
-     &                       ladinit, optimcycle, myThid
-     &        , xx_gen_dummy )
+      call active_read_xyz(
+     &      fnamefld, tmpfld3d, irec, doglobalread,
+     &      ladinit, optimcycle, myThid, xx_gen_dummy )
 #else
-        CALL READ_REC_XYZ_RL( fnamefld, tmpfld3d, iRec, 1, myThid )
+      CALL READ_REC_XYZ_RL( fnamefld, tmpfld3d, iRec, 1, myThid )
 #endif
 
-c--     Loop over this thread tiles.
-        do bj = jtlo,jthi
-          do bi = itlo,ithi
+c--   Loop over this thread tiles.
+      do bj = jtlo,jthi
+        do bi = itlo,ithi
 
-            num_gen(bi,bj)  = 0. _d 0
-            objf_gen(bi,bj) = 0. _d 0
+          num_gen(bi,bj)  = 0. _d 0
+          objf_gen(bi,bj) = 0. _d 0
 
-            do k = 1,Nr
+          do k = 1,Nr
             do j = jmin,jmax
               do i = imin,imax
                 if (xx_gen_mask(i,j,k,bi,bj) .ne. 0. _d 0) then
@@ -320,10 +326,10 @@ c--     Loop over this thread tiles.
                 endif
               enddo
             enddo
-            enddo
-
           enddo
+
         enddo
+      enddo
 
 #endif /* ALLOW_CTRL */
 

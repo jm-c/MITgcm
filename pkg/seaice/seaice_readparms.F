@@ -87,6 +87,24 @@ C     SEAICE_freeze     :: FREEZING TEMP. OF SEA WATER
       CHARACTER*(MAX_LEN_MBUF) IceAgeFile, IceAgeTrFile(4)
       _RL SEAICE_abEps
       LOGICAL SEAICEuseAB2
+#ifdef ALLOW_COST
+C     former ALLOW_SEAICE_COST_SMR_AREA related flags
+      _RL  mult_smrarea
+      _RL  mult_smrsst
+      _RL  mult_smrsss
+      CHARACTER*(MAX_LEN_FNAM) smrarea_errfile
+      CHARACTER*(MAX_LEN_FNAM) smrareadatfile
+      CHARACTER*(MAX_LEN_FNAM) smrareabarfile
+      CHARACTER*(MAX_LEN_FNAM) smrsstbarfile
+      CHARACTER*(MAX_LEN_FNAM) smrsssbarfile
+      INTEGER smrareastartdate1
+      INTEGER smrareastartdate2
+      _RL wsmrarea0
+      _RL wmean_smrarea
+      _RL smrareaperiod
+      _RL SEAICE_clamp_salt
+      _RL SEAICE_clamp_theta
+#endif /* ALLOW_COST */
 
 C--   SEAICE parameters
       NAMELIST /SEAICE_PARM01/
@@ -119,7 +137,7 @@ C--   SEAICE parameters
      & SEAICE_evpAlpha, SEAICE_evpBeta,
      & SEAICEaEVPcoeff, SEAICEaEVPcStar, SEAICEaEVPalphaMin,
      & SEAICE_zetaMin, SEAICE_zetaMaxFac, SEAICEusePicardAsPrecon,
-     & SEAICEuseKrylov, SEAICEuseJFNK,
+     & SEAICEuseLSRflex, SEAICEuseKrylov, SEAICEuseJFNK,
      & SEAICEnonLinIterMax, SEAICElinearIterMax, SEAICEnonLinTol,
      & SEAICEnewtonIterMax, SEAICEkrylovIterMax, JFNKgamma_nonlin,
      & SEAICEpreconNL_Iter, SEAICEpreconLinIter,
@@ -184,9 +202,8 @@ C--   SEAICE parameters
      &          mult_ice_export, mult_ice, cost_ice_flag,
      &          costIceStart1, costIceStart2,
      &          costIceEnd1, costIceEnd2,
-     &          cost_ice_flag,
-     &          SEAICE_clamp_salt, SEAICE_clamp_theta,
      &          SEAICE_cutoff_area, SEAICE_cutoff_heff,
+     &          SEAICE_clamp_salt, SEAICE_clamp_theta,
      &          mult_smrsst, smrsstbarfile,
      &          mult_smrsss, smrsssbarfile,
      &          mult_smrarea, smrareabarfile, smrareadatfile,
@@ -217,7 +234,7 @@ C     print a (weak) warning if data.seaice is found
       _BEGIN_MASTER(myThid)
 
 C--   set default sea ice parameters
-#ifdef SEAICE_ALLOW_DYNAMICS
+#if ( defined SEAICE_CGRID || defined SEAICE_BGRID_DYNAMICS )
       SEAICEuseDYNAMICS  = .TRUE.
 #else
       SEAICEuseDYNAMICS  = .FALSE.
@@ -316,6 +333,7 @@ c     DIFF1      = .004 _d 0
       SEAICE_deltaTevp   = UNSET_RL
       SEAICEuseBDF2      = .FALSE.
       SEAICEuseKrylov    = .FALSE.
+      SEAICEuseLSRflex   = .FALSE.
 C     JFNK stuff
       SEAICEuseJFNK       = .FALSE.
       SEAICEuseIMEX       = .FALSE.
@@ -596,23 +614,23 @@ C-    end retired parameters
       costIceEnd1       =  0
       costIceEnd2       =  0
       cost_ice_flag     =  1
-      SEAICE_clamp_salt  = 27.5   _d 0
-      SEAICE_clamp_theta = 0.0001 _d 0
       SEAICE_cutoff_area = 0.0001 _d 0
       SEAICE_cutoff_heff = 0. _d 0
-c
-      mult_smrsst       =  0. _d 0
-      mult_smrsss       =  0. _d 0
-      mult_smrarea      =  0. _d 0
-      wsmrarea0         =  0.5 _d 0
-      wmean_smrarea     =  0.5 _d 0
-      smrsstbarfile     =  'smrsstbar'
-      smrsssbarfile     =  'smrsssbar'
-      smrareabarfile    =  'smrareabar'
+C     retired cost related parameters
+      SEAICE_clamp_salt  = UNSET_RL
+      SEAICE_clamp_theta = UNSET_RL
+      mult_smrsst       =  UNSET_RL
+      mult_smrsss       =  UNSET_RL
+      mult_smrarea      =  UNSET_RL
+      wsmrarea0         =  UNSET_RL
+      wmean_smrarea     =  UNSET_RL
+      smrsstbarfile     =  ' '
+      smrsssbarfile     =  ' '
+      smrareabarfile    =  ' '
       smrareadatfile    =  ' '
       smrarea_errfile   =  ' '
-      smrareastartdate1 = locDate(1)
-      smrareastartdate2 = locDate(2)
+      smrareastartdate1 = UNSET_I
+      smrareastartdate2 = UNSET_I
 #endif /* ALLOW_COST */
 
 #ifdef ALLOW_SITRACER
@@ -848,6 +866,9 @@ C     Euler time stepping scheme of Zhang+Hibler (1997)
 C     Make sure that we have least two pseudo time steps for Picard-LSR
       IF ( SEAICEuseLSR .AND. .NOT. SEAICEusePicardAsPrecon )
      &     SEAICEnonLinIterMax = MAX(SEAICEnonLinIterMax,2)
+
+C     If we do not use the LSR solver, using LSRflex makes no sense
+      IF ( .NOT. SEAICEuseLSR ) SEAICEuseLSRflex = .FALSE.
 
 C-    different defaults for different linear solvers
       IF ( SEAICElinearIterMax .EQ. UNSET_I ) THEN
@@ -1287,6 +1308,37 @@ C-    Retired parameters
      &  'is no longer allowed in file "data.seaice"'
        CALL PRINT_ERROR( msgBuf, myThid )
       ENDIF
+#ifdef ALLOW_COST
+      IF ( smrsstbarfile .NE.  ' ' .OR. smrsssbarfile .NE. ' '
+     &     .OR. smrareabarfile .NE. ' ' .OR. smrareadatfile .NE. ' '
+     &     .OR. smrarea_errfile .NE. ' '
+     &     .OR. mult_smrsst .NE. UNSET_RL .OR. mult_smrsss.NE.UNSET_RL
+     &     .OR. mult_smrarea .NE. UNSET_RL .OR. wsmrarea0 .NE.UNSET_RL
+     &     .OR. wmean_smrarea .NE. UNSET_RL
+     &     .OR. smrareastartdate1 .NE. UNSET_I
+     &     .OR. smrareastartdate2 .NE. UNSET_I
+     &     ) THEN
+       nRetired = nRetired + 1
+       WRITE(msgBuf,'(A,A)')
+     &  'S/R SEAICE_READPARMS: "SMR"-related parameters ',
+     &  'are no longer allowed in file "data.seaice"'
+       CALL PRINT_ERROR( msgBuf, myThid )
+      ENDIF
+      IF ( SEAICE_clamp_salt .NE. UNSET_RL ) THEN
+       nRetired = nRetired + 1
+       WRITE(msgBuf,'(A,A)')
+     &  'S/R SEAICE_READPARMS: "SEAICE_clamp_salt" ',
+     &  'is no longer allowed in file "data.seaice"'
+       CALL PRINT_ERROR( msgBuf, myThid )
+      ENDIF
+      IF ( SEAICE_clamp_theta .NE. UNSET_RL ) THEN
+       nRetired = nRetired + 1
+       WRITE(msgBuf,'(A,A)')
+     &  'S/R SEAICE_READPARMS: "SEAICE_clamp_theta" ',
+     &  'is no longer allowed in file "data.seaice"'
+       CALL PRINT_ERROR( msgBuf, myThid )
+      ENDIF
+#endif /* ALLOW_COST */
       IF ( nRetired .GT. 0 ) THEN
        WRITE(msgBuf,'(2A)') 'S/R SEAICE_READPARMS: ',
      &  'Error reading parameter file "data.seaice"'
