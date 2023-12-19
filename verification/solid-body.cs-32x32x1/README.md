@@ -1,9 +1,9 @@
-Simple cubed-sphere grid, solid-body rotation test case
+Simple solid-body rotation test on cubed-sphere grid
 ========================================================
 
 ### Overview:
 This is a single level, steady-state example on cubed-sphere (cs-32) grid with initial zonal wind field and surface pressure anomaly that corresponds to an additional relative rotation 
-($ \omega' $) on top of the solid-planet rotation ($\Omega$):
+($\omega\'$) on top of the solid-planet rotation ($\Omega$) and around the same axis:
 
 $$ U = \omega' \times R $$
 
