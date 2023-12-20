@@ -8,13 +8,9 @@ $$ U(\phi) = U_{eq} ~ \cos( \phi ) ~~~ \mathrm{with:} ~~~ U_{eq} = \omega' \time
 
 $$ \eta(\phi) = \rho_{const} ~ U_{eq} ~ ( \Omega R + U_{eq} / 2 ) ~~ ( \cos^{2}(\phi) - 2/3 ) $$
 
+The parameter used here are slightly different from Earth (an oportunity to test this capability) with a smaller planet radius (`rSphere`) $R = 5500 km$ , a slower rotation ( 30.h period, `rotationPeriod=108000.`) and an Equatorial zonal wind $U_{eq} = 80 m/s$.
+
 The set-up uses linear free-surface with uniform density $\rho_{const} = 1$ , no viscosity and no bottom friction so that the solution is expected to remain unchanged over time.
-
-The parameter used here are slightly different from Earth (an oportunity to test this
-capability) with a smaller planet radius (`rSphere`) $R = 5500 km$ , a slower rotation 
-( 30.h period, `rotationPeriod=108000.`) and Equatorial zonal wind $U_{eq} = 80 m/s$.
-
-`The **secondary** test `rough.Bot` uses the logarithmic law of the wall to compute the drag coefficient for quadratic bottom drag as a function of distance from the bottom (i.e. cell thickness) and a prescribed roughness length `zRoughBot = 0.01` (in meters). For this configuration (i.e. vertical grid spacing) this value of `zRoughBot` corresponds to approximately `bottomDragQuadratic=5.E-2`. For consistency, the bottom boundary conditions is set to free slip (`no_slip_bottom=.FALSE.`).
 
 ## Instructions
 Configure and compile the code:
