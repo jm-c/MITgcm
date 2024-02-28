@@ -45,7 +45,7 @@ make
 ```
 
 `prep_make` generates a local `Makefile` from `makefile_templ` and from `$myExp`
-`build/Makefile`. It fills some `makefile_templ` placeholder ``_GET_keyWord''
+`build/Makefile`. It fills some `makefile_templ` placeholder "_GET_keyWord"
 with the corresponding option/parameter value "keyWord" found in
 the build/Makefile (the current list of keyWords is: BLD_DIR, EXTRA_OPT, CPPCMD,
 SFX, FC, FFLAGS and FOPTIM).
