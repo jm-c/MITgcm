@@ -43,7 +43,7 @@ download `cpl_gray_swamp+ocn` from the `MITgcm/verification_other/` repository.
 ## Short test run to check:
 One could compile and run a very short test (4.h simulated time), using only 3 processors
 (one for each component), by running the batch script `MITgcm/tools/run_cpl_test`
-following the same instructions as described in `verification/cpl_aim+ocn/README.md`.
+following the same instructions as described in `MITgcm/verification/cpl_aim+ocn/README.md`.
 This provide a quick way to check that everything is in place for a longer and more meaningful
 simulation as described below.
 
