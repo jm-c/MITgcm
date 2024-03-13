@@ -9,17 +9,18 @@ The code here is for the continental configuration used in Tuckman et al., The Z
 
 This directory consists of:
 
-* `cpl_gray+swamp+ocn/build_atm/`   : directory to build coupling executable
-* `cpl_gray+swamp+ocn/code_atm/`   : specific code for atmosphere
-* `cpl_gray+swamp+ocn/input_atm/`    : specific input for atmosphere
+* `cpl_gray+swamp+ocn/build_atm/`   : directory to build atmospheric component executable
+* `cpl_gray+swamp+ocn/code_atm/`    : specific code for atmosphere
+* `cpl_gray+swamp+ocn/input_atm/`   : specific input for atmosphere
 
-* `cpl_gray+swamp+ocn/build_ocn/`   : directory to build coupling executable
-* `cpl_gray+swamp+ocn/code_ocn/`   : specific code for ocean
-* `cpl_gray+swamp+ocn/input_ocn/`    : specific input for ocean
+* `cpl_gray+swamp+ocn/build_ocn/`   : directory to build oceanic component executable
+* `cpl_gray+swamp+ocn/code_ocn/`    : specific code for ocean
+* `cpl_gray+swamp+ocn/input_ocn/`   : specific input for ocean
 
-* `cpl_gray+swamp+ocn/build_cpl/`   : directory to build coupling executable
-* `cpl_gray+swamp+ocn/code_cpl/`   : specific code for coupling
-* `cpl_gray+swamp+ocn/input_cpl/`    : specific input for coupling
+* `cpl_gray+swamp+ocn/build_cpl/`   : directory to build coupler executable
+* `cpl_gray+swamp+ocn/code_cpl/`    : specific code for coupler
+* `cpl_gray+swamp+ocn/input_cpl/`   : specific input for coupler
+* `cpl_gray+swamp+ocn/shared_code/` : specific coupling code shared by all 3 components
 
 * `cpl_gray+swamp+ocn/run_dir/`  : Folder where you should run the code
 
@@ -36,14 +37,14 @@ The `runi_dir` folder is where the code will be run and the output will end up. 
 
 # Instructions:
 
-Download MITgcm from the MITgcm repository to `$my_base_dir$/MITgcm` and, in `MITgcm` directory,  
+Download MITgcm from the MITgcm repository to `$my_base_dir$/MITgcm` and, in `MITgcm` directory,
 download `cpl_gray_swamp+ocn` from the `MITgcm/verification_other/` repository.
 
 ## Short test run to check:
 One could compile and run a very short test (4.h simulated time), using only 3 processors
 (one for each component), by running the batch script `MITgcm/tools/run_cpl_test`
 following the same instructions as described in `verification/cpl_aim+ocn/README.md`.
-This provide a quick way to check that everything is in place for a longer and meaningful
+This provide a quick way to check that everything is in place for a longer and more meaningful
 simulation as described below.
 
 ## Preparing the executables:
