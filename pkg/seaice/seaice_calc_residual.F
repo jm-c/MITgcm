@@ -25,9 +25,9 @@ C     === Global variables ===
 #include "SIZE.h"
 #include "EEPARAMS.h"
 #include "SEAICE_SIZE.h"
-#ifdef SEAICE_ALLOW_BOTTOMDRAG
-#include "SEAICE_PARAMS.h"
-#endif /* SEAICE_ALLOW_BOTTOMDRAG */
+#if ( defined SEAICE_ALLOW_BOTTOMDRAG || defined SEAICE_ALLOW_SIDEDRAG )
+# include "SEAICE_PARAMS.h"
+#endif
 #include "SEAICE.h"
 
 C     !INPUT/OUTPUT PARAMETERS:
@@ -49,7 +49,7 @@ C     u/vIceRes :: residual of sea-ice momentum equations
       _RL uIceRes(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL vIceRes(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
 
-#ifdef SEAICE_ALLOW_JFNK
+#if ( defined SEAICE_CGRID && defined SEAICE_ALLOW_JFNK )
 C     u/vIceLHS :: left hand side of momentum equations
       _RL uIceLHS(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
       _RL vIceLHS(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
@@ -91,6 +91,12 @@ C     viscosities are required
      O     CbotC,
      I     krylovIter, myTime, myIter, myThid )
 #endif /* SEAICE_ALLOW_BOTTOMDRAG */
+#ifdef SEAICE_ALLOW_SIDEDRAG
+        IF ( SEAICEsideDrag .NE. 0. _d 0 ) CALL SEAICE_SIDEDRAG_STRESS(
+     I       uIceLoc, vIceLoc, coastRoughU, coastRoughV, AREA,
+     O       sideDragU, sideDragV,
+     I       krylovIter, myTime, myIter, myThid )
+#endif /* SEAICE_ALLOW_SIDEDRAG */
       CALL SEAICE_CALC_STRAINRATES(
      I     uIceLoc, vIceLoc,
      O     e11, e22, e12,
@@ -141,7 +147,7 @@ C     Calculate the residual
         ENDDO
        ENDDO
 
-#endif /* SEAICE_ALLOW_JFNK */
+#endif /* SEAICE_CGRID and SEAICE_ALLOW_JFNK */
 
       RETURN
       END

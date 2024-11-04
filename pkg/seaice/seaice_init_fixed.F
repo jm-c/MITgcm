@@ -1,15 +1,20 @@
 #include "SEAICE_OPTIONS.h"
 
-CStartOfInterface
+CBOP
+C !ROUTINE: SEAICE_INIT_FIXED
+
+C !INTERFACE: ==========================================================
       SUBROUTINE SEAICE_INIT_FIXED( myThid )
+C !DESCRIPTION: \bv
 C     *==========================================================*
 C     | SUBROUTINE SEAICE_INIT_FIXED
 C     | o Initialization of sea ice model.
 C     *==========================================================*
 C     *==========================================================*
       IMPLICIT NONE
+C \ev
 
-C     === Global variables ===
+C !USES: ===============================================================
 #include "SIZE.h"
 #include "EEPARAMS.h"
 #include "PARAMS.h"
@@ -20,12 +25,12 @@ C     === Global variables ===
 #include "SEAICE.h"
 #include "SEAICE_TRACER.h"
 
-C     === Routine arguments ===
+C !INPUT PARAMETERS: ===================================================
 C     myThid - Thread no. that called this routine.
       INTEGER myThid
 CEndOfInterface
 
-C     === Local variables ===
+C !LOCAL VARIABLES: ====================================================
 #ifdef SEAICE_ITD
 C     msgBuf      :: Informational/error message buffer
       CHARACTER*(MAX_LEN_MBUF) msgBuf
@@ -47,9 +52,13 @@ cif   penetrating the model shallowest layer
 #endif /* SHORTWAVE_HEATING */
 C     local copy of surface layer thickness in meters
       _RL dzSurf
-#ifndef SEAICE_CGRID
+#ifdef SEAICE_BGRID_DYNAMICS
       _RL mask_uice
 #endif
+#ifdef SEAICE_ALLOW_SIDEDRAG
+      LOGICAL readCoastLineFields
+#endif
+CEOP
 
       IF ( usingPCoords ) THEN
        kSrf        = Nr
@@ -268,7 +277,7 @@ C-    loops on tile indices bi,bj:
           SIMaskV(i,j,bi,bj) = maskS(i,j,kSrf,bi,bj)
          ENDDO
         ENDDO
-#ifndef SEAICE_CGRID
+#ifdef SEAICE_BGRID_DYNAMICS
         DO j=1-OLy+1,sNy+OLy
          DO i=1-OLx+1,sNx+OLx
           UVM(i,j,bi,bj)=0. _d 0
@@ -277,7 +286,7 @@ C-    loops on tile indices bi,bj:
           IF(mask_uice.GT.3.5 _d 0) UVM(i,j,bi,bj)=1. _d 0
          ENDDO
         ENDDO
-#endif /* ndef SEAICE_CGRID */
+#endif
 
 C     coefficients for metric terms
 #ifdef SEAICE_CGRID
@@ -334,7 +343,9 @@ C     approximation
           ENDDO
          ENDDO
         ENDIF
-#else /* not SEAICE_CGRID */
+#endif /* SEAICE_CGRID */
+
+#ifdef SEAICE_BGRID_DYNAMICS
         DO j=1-OLy,sNy+OLy
          DO i=1-OLx,sNx+OLx
           k1AtC(i,j,bi,bj) = 0.0 _d 0
@@ -405,10 +416,89 @@ C     approximation
           ENDDO
          ENDDO
         ENDIF
-#endif /* not SEAICE_CGRID */
+C--   Choose a proxy level for geostrophic velocity,
+        DO j=1-OLy,sNy+OLy
+         DO i=1-OLx,sNx+OLx
+          KGEO(i,j,bi,bj)   = 0
+         ENDDO
+        ENDDO
+        DO j=1-OLy,sNy+OLy
+         DO i=1-OLx,sNx+OLx
+#ifdef SEAICE_BICE_STRESS
+          KGEO(i,j,bi,bj) = 1
+#else /* SEAICE_BICE_STRESS */
+          IF (klowc(i,j,bi,bj) .LT. 2) THEN
+           KGEO(i,j,bi,bj) = 1
+          ELSE
+           KGEO(i,j,bi,bj) = 2
+           DO WHILE ( abs(rC(KGEO(i,j,bi,bj))) .LT. 50.0 _d 0 .AND.
+     &          KGEO(i,j,bi,bj) .LT. (klowc(i,j,bi,bj)-1) )
+              KGEO(i,j,bi,bj) = KGEO(i,j,bi,bj) + 1
+           ENDDO
+          ENDIF
+#endif /* SEAICE_BICE_STRESS */
+         ENDDO
+        ENDDO
+#endif /* SEAICE_BGRID_DYNAMICS */
 C-    end bi,bj loops
        ENDDO
       ENDDO
+
+#ifdef SEAICE_ALLOW_SIDEDRAG
+      DO bj=myByLo(myThid),myByHi(myThid)
+       DO bi=myBxLo(myThid),myBxHi(myThid)
+        DO j=1-OLy+1,sNy+OLy-1
+         DO i=1-OLx+1,sNx+OLx-1
+          coastRoughU(i,j,bi,bj) = ( 3. _d 0
+     &         - SIMaskU(i,j-1,bi,bj)
+     &         - SIMaskU(i,j,bi,bj)
+     &         - SIMaskU(i,j+1,bi,bj)) * SIMaskU(i,j,bi,bj)
+          coastRoughV(i,j,bi,bj) = ( 3. _d 0
+     &         - SIMaskV(i-1,j,bi,bj)
+     &         - SIMaskV(i,j,bi,bj)
+     &         - SIMaskV(i+1,j,bi,bj) ) * SIMaskV(i,j,bi,bj)
+         ENDDO
+        ENDDO
+       ENDDO
+      ENDDO
+
+      readCoastLineFields =
+     &     uCoastLineFile .NE. ' ' .OR. vCoastLineFile .NE. ' '
+      IF ( readCoastLineFields ) THEN
+       IF ( uCoastLineFile .NE. ' ' ) THEN
+        CALL READ_FLD_XY_RL( uCoastLineFile,' ',coastRoughU,0,myThid )
+        DO bj=myByLo(myThid),myByHi(myThid)
+         DO bi=myBxLo(myThid),myBxHi(myThid)
+          DO j=1-OLy,sNy+OLy-1
+           DO i=1-OLx,sNx+OLx
+            coastRoughU(i,j,bi,bj) = coastRoughU(i,j,bi,bj)
+     &           * SIMaskU(i,j,bi,bj) * recip_dxC(i,j,bi,bj)
+           ENDDO
+          ENDDO
+         ENDDO
+        ENDDO
+       ENDIF
+       IF ( vCoastLineFile .NE. ' ' ) THEN
+        CALL READ_FLD_XY_RL( vCoastLineFile,' ',coastRoughV,0,myThid )
+        DO bj=myByLo(myThid),myByHi(myThid)
+         DO bi=myBxLo(myThid),myBxHi(myThid)
+          DO j=1-OLy,sNy+OLy
+           DO i=1-OLx,sNx+OLx-1
+            coastRoughV(i,j,bi,bj) = coastRoughV(i,j,bi,bj)
+     &           * SIMaskV(i,j,bi,bj) * recip_dyC(i,j,bi,bj)
+           ENDDO
+          ENDDO
+         ENDDO
+        ENDDO
+       ENDIF
+      ENDIF
+
+      CALL EXCH_UV_XY_RL( coastRoughU, coastRoughV, .FALSE., myThid )
+      CALL WRITE_FLD_XY_RL( 'coastRoughUnormalized',
+     &     ' ', coastRoughU, -1, myThid )
+      CALL WRITE_FLD_XY_RL( 'coastRoughVnormalized',
+     &     ' ', coastRoughV, -1, myThid )
+#endif /* SEAICE_ALLOW_SIDEDRAG */
 
 #ifdef ALLOW_SHELFICE
       IF ( useShelfIce ) THEN
@@ -433,36 +523,6 @@ C--   Prevent seaice to form where Ice-Shelf is present
        CALL EXCH_UV_XY_RL( SIMaskU, SIMaskV, .FALSE., myThid )
       ENDIF
 #endif /* ALLOW_SHELFICE */
-
-#ifndef SEAICE_CGRID
-C--   Choose a proxy level for geostrophic velocity,
-      DO bj=myByLo(myThid),myByHi(myThid)
-       DO bi=myBxLo(myThid),myBxHi(myThid)
-        DO j=1-OLy,sNy+OLy
-         DO i=1-OLx,sNx+OLx
-          KGEO(i,j,bi,bj)   = 0
-         ENDDO
-        ENDDO
-        DO j=1-OLy,sNy+OLy
-         DO i=1-OLx,sNx+OLx
-#ifdef SEAICE_BICE_STRESS
-          KGEO(i,j,bi,bj) = 1
-#else /* SEAICE_BICE_STRESS */
-          IF (klowc(i,j,bi,bj) .LT. 2) THEN
-           KGEO(i,j,bi,bj) = 1
-          ELSE
-           KGEO(i,j,bi,bj) = 2
-           DO WHILE ( abs(rC(KGEO(i,j,bi,bj))) .LT. 50.0 _d 0 .AND.
-     &          KGEO(i,j,bi,bj) .LT. (klowc(i,j,bi,bj)-1) )
-              KGEO(i,j,bi,bj) = KGEO(i,j,bi,bj) + 1
-           ENDDO
-          ENDIF
-#endif /* SEAICE_BICE_STRESS */
-         ENDDO
-        ENDDO
-       ENDDO
-      ENDDO
-#endif /* ndef SEAICE_CGRID */
 
       RETURN
       END
