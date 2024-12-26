@@ -232,9 +232,9 @@ C--   Continuous equation parameters
      & tempDiffusion, tempAdvection, tempForcing, temp_stayPositive,
      & saltDiffusion, saltAdvection, saltForcing, salt_stayPositive,
      & implicSurfPress, implicDiv2DFlow, implicitNHPress,
-     & implicitFreeSurface, rigidLid, freeSurfFac,
+     & rigidLid, implicitFreeSurface, freeSurfFac, exactConserv,
+     & solveForDeltaP, uniformLin_PhiSurf, linFSConserveTr,
      & hFacMin, hFacMinDz, hFacMinDp, hFacMinDr,
-     & exactConserv, linFSConserveTr, uniformLin_PhiSurf,
      & nonlinFreeSurf, hFacInf, hFacSup, select_rStar,
      & nonHydrostatic, selectNHfreeSurf, quasiHydrostatic,
      & implicitIntGravWave, staggerTimeStep, doResetHFactors,
@@ -261,7 +261,7 @@ C--   Elliptic solver parameters
      & cg2dMaxIters, cg2dMinItersNSA, cg2dChkResFreq, cg2dUseMinResSol,
      & cg2dTargetResidual, cg2dTargetResWunit,
      & cg2dpcOffDFac, cg2dPreCondFreq,
-     & cg3dMaxIters, cg3dChkResFreq, 
+     & cg3dMaxIters, cg3dChkResFreq,
      & cg3dTargetResidual, cg3dTargetResWunit,
      & useNSACGSolver, useSRCGSolver, printResidualFreq
 
