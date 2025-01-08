@@ -175,7 +175,6 @@ C-    first bi,bj loops:
           DO i=1,sNx
            cg2d_b(i,j,bi,bj) =
      &       tmpFac*_rA(i,j,bi,bj)*EmPmR(i,j,bi,bj)/deltaTMom
-     &                            *maskInC(i,j,bi,bj)
           ENDDO
          ENDDO
         ENDIF
