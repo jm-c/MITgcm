@@ -662,20 +662,11 @@ C-    Save isoneutral gradient and Redi diffusivity
          GM_Nm2(i,j,k,bi,bj) = oneRL
      &       / MAX( gravitySign*sigmaR(i,j,k), GM_Small_Number )
          GM_isoK3d(i,j,k,bi,bj) =
-# ifdef GM_READ_K3D_REDI
-     &       GM_inpK3dRedi(i,j,k,bi,bj)
-# else
+#ifdef GM_USE_K3D_REDI
+     &       locK3dRedi(i,j,k)
+#else
      &       GM_isopycK*GM_isoFac1d(k)*GM_isoFac2d(i,j,bi,bj)
-# endif
-# ifdef GM_VISBECK_VARIABLE_K
-     &     + VisbeckK(i,j,bi,bj)*GM_isoFac_calcK
-# endif
-# ifdef ALLOW_GM_LEITH_QG
-     &     + GM_LeithQG_K(i,j,k,bi,bj)*GM_isoFac_calcK
-# endif
-# if ( defined GM_BATES_K3D && !defined GM_BATES_PASSIVE )
-     &     +  GM_BatesK3d(i,j,k,bi,bj)*GM_isoFac_calcK
-# endif
+#endif
 C     For now, just reset tensor:
          Kwx(i,j,k,bi,bj)  = 0. _d 0
          Kwy(i,j,k,bi,bj)  = 0. _d 0
