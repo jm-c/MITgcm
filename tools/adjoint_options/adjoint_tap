@@ -4,6 +4,8 @@
 
 DEFINES="$DEFINES -DDEFAULT_R8"
 
+# It is important to use the makefile macro "\$(TOOLSDIR)" instead of
+# the potentially undefined bash-variable "${TOOLSDIR}".
 DIFF_FLAGS="-ext \$(TOOLSDIR)/TAP_support/flow_tap -head 'the_main_loop(fc)/(xx_genarr3d_dummy, xx_genarr2d_dummy, xx_gentim2d_dummy)'"
 
 TAPENADE_FLAGS="$DIFF_FLAGS $TAPENADE_FLAGS"
