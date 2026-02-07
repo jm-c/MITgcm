@@ -822,15 +822,13 @@ linkdata()
 			    fi
 			fi
 		    done
-		    printf ' ;' 1>&2
-		    if test -x "../"$ldir"/"prepare_run ; then
-			"../"$ldir"/"prepare_run 1>&2
-		    else
-			echo '' 1>&2
-		    fi
+		    printf ' ;\n' 1>&2
 		fi
 		prevDir=$ldir
 	    done
+	    if test -x prepare_run ; then
+		./prepare_run 1>&2
+	    fi
 	)
     fi
 }
