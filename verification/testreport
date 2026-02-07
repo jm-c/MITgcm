@@ -907,7 +907,7 @@ runmodel()
 	    ENDVAL=`tail $OUTPUTFILE | grep -c 'PROGRAM MAIN: Execution ended Normally'`
 	    touch $RUNLOG
 	    if test -f run.log_tmp ; then cat run.log_tmp >> $RUNLOG ; fi
-	    echo "---------->> $OUTPUTFILE is up to date " >> $RUNLOG 2>&1
+	    echo "---------->> $OUTPUTFILE is up to date" >> $RUNLOG 2>&1
 	  fi
 	fi
 	rm -f run.log_tmp
